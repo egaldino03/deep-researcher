@@ -1,17 +1,13 @@
-from config import INDEX_NAME, PINECONE_API_KEY
-from pinecone import Pinecone, ServerlessSpec
-from langchain_openrouter 
+from config import INDEX_NAME, OPENROUTER_API_KEY
+from langchain_openai import OpenAIEmbeddings
+from langchain_pinecone import PineconeVectorStore
+from pinecone_client import pc
 
-pc = Pinecone(api_key=PINECONE_API_KEY)
-
-if not pc.has_index(INDEX_NAME):
-    pc.create_index(
-        name=INDEX_NAME,
-        dimension=1536,
-        metric="cosine",
-        spec=ServerlessSpec(cloud="aws", region="us-east-1"),
-    )
+embeddings = OpenAIEmbeddings(
+    model="text-embedding-3-small",
+    base_url="https://openrouter.ai/api/v1",
+    api_key=OPENROUTER_API_KEY,
+)
 
 index = pc.Index(INDEX_NAME)
-
-embeddings =
+vector_store = PineconeVectorStore(index=index, embedding=embeddings)
